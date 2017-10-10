@@ -1157,17 +1157,17 @@ namespace jcPimSoftware
                     {
                         sa = new SocketAdmin(this.Handle);
                         sa_ms = new SocketAdmin_MS(this.Handle);
-                        //string ip = IniFile.GetString("connServer", "addr", "127.0.0.1", Application.StartupPath + "\\SqlInfo.ini");
-                        string ip = "";
-                        IPHostEntry IpEntry = Dns.GetHostEntry(Dns.GetHostName());
-                        for (int i = 0; i < IpEntry.AddressList.Length; i++)
-                        {
-                            if (IpEntry.AddressList[i].AddressFamily == AddressFamily.InterNetwork)
-                            {
-                                ip= IpEntry.AddressList[i].ToString();
-                                break;
-                            }
-                        }
+                        string ip = IniFile.GetString("connServer", "addr", "127.0.0.1", Application.StartupPath + "\\SqlInfo.ini");
+                        //string ip = "";
+                        //IPHostEntry IpEntry = Dns.GetHostEntry(Dns.GetHostName());
+                        //for (int i = 0; i < IpEntry.AddressList.Length; i++)
+                        //{
+                        //    if (IpEntry.AddressList[i].AddressFamily == AddressFamily.InterNetwork)
+                        //    {
+                        //        ip= IpEntry.AddressList[i].ToString();
+                        //        break;
+                        //    }
+                        //}
                         int port = Convert.ToInt32(IniFile.GetString("connServer", "port", "6307", Application.StartupPath + "\\SqlInfo.ini"));
                         sa.ReachedEventHandler += sa_ReachedEventHandler2;
                         ms_ip = ip;
