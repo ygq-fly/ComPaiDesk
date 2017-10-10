@@ -560,8 +560,9 @@ namespace jcPimSoftware
                                                                                     ref rfStatus_1,
                                                                                     null, null);
 
-                            Ir_RF2_Sampel = del_RF2_Sampel.BeginInvoke(exe_params.DevInfo.RF_Addr2,
+                            Ir_RF2_Sampel = del_RF2_Set_Sample.BeginInvoke(exe_params.DevInfo.RF_Addr2,
                                                                                             exe_params.RFPriority,
+                                                                                            item[i].P2, item[i].Tx2,
                                                                                             ref rfStatus_2,
                                                                                             null, null);
 
