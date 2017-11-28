@@ -573,7 +573,7 @@ namespace jcPimSoftware
                             Ir_Spec = del_spe.BeginInvoke(exe_params.SpeParam, null, null);
 
                             bErrors1 |= del_RF1_Set_Sample.EndInvoke(ref rfStatus_1, Ir_RF1_Sampel);
-                            bErrors2 |= del_RF2_Sampel.EndInvoke(ref rfStatus_2, Ir_RF2_Sampel);
+                            bErrors2 |= del_RF2_Set_Sample.EndInvoke(ref rfStatus_2, Ir_RF2_Sampel);
                         }
                         else
                         {

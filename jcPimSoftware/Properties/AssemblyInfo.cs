@@ -29,4 +29,4 @@ using System.Runtime.InteropServices;
 //      内部版本号
 //      修订号
 //
-[assembly: AssemblyVersion("4.3.0.8")]
+[assembly: AssemblyVersion("4.3.0.12")]

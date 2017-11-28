@@ -289,6 +289,7 @@
             // 
             // numericUpDown4
             // 
+            this.numericUpDown4.DecimalPlaces = 2;
             this.numericUpDown4.Font = new System.Drawing.Font("Microsoft YaHei", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.numericUpDown4.Location = new System.Drawing.Point(159, 139);
             this.numericUpDown4.Maximum = new decimal(new int[] {
@@ -303,6 +304,7 @@
             // 
             // numericUpDown3
             // 
+            this.numericUpDown3.DecimalPlaces = 2;
             this.numericUpDown3.Font = new System.Drawing.Font("Microsoft YaHei", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.numericUpDown3.Location = new System.Drawing.Point(368, 141);
             this.numericUpDown3.Maximum = new decimal(new int[] {
@@ -328,6 +330,7 @@
             // 
             // numericUpDown2
             // 
+            this.numericUpDown2.DecimalPlaces = 1;
             this.numericUpDown2.Font = new System.Drawing.Font("Microsoft YaHei", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.numericUpDown2.Location = new System.Drawing.Point(368, 79);
             this.numericUpDown2.Maximum = new decimal(new int[] {
@@ -342,6 +345,7 @@
             // 
             // numericUpDown1
             // 
+            this.numericUpDown1.DecimalPlaces = 1;
             this.numericUpDown1.Font = new System.Drawing.Font("Microsoft YaHei", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.numericUpDown1.Location = new System.Drawing.Point(159, 78);
             this.numericUpDown1.Maximum = new decimal(new int[] {

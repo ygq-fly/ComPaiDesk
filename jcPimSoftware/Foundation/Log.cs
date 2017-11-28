@@ -17,7 +17,8 @@ namespace jcPimSoftware
             ISOLATION = 2,
             VSWR = 3,
             HARMONIC = 4,
-            TestMode = 5
+            TestMode = 5,
+            API=6
         }
 
         private const string strPIM_LogPath = "C:\\PIM_Log.txt";
@@ -26,6 +27,7 @@ namespace jcPimSoftware
         private const string strVSW_LogPath = "C:\\VSW_Log.txt";
         private const string strHAR_LogPath = "C:\\HAR_Log.txt";
         private const string strTEST_LogPath = "C:\\TEST_Log.txt";
+        private const string strAPI_LogPath = "C:\\API_Log.txt";
 
         /// <summary>
         /// 记录日志文件
@@ -54,6 +56,9 @@ namespace jcPimSoftware
                     break;
                 case EFunctionType.TestMode:
                     strFilePath = strTEST_LogPath;
+                    break;
+                case EFunctionType.API:
+                    strFilePath = strAPI_LogPath;
                     break;
                 default:
                     break;

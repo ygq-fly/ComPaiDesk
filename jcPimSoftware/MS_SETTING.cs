@@ -27,6 +27,8 @@ namespace jcPimSoftware
         PowerStatus status2;
         private SweepCtrl ctrl;
         decimal pimval;
+        bool openRf1_ = false;
+        bool openRf2_ = false;
         /// <summary>
         /// 执行扫描参数，在扫描函数中，应该使用此参数
         /// 它从usr_sweeps复制过来
@@ -221,12 +223,20 @@ namespace jcPimSoftware
                     bool res = false;
                     this.Invoke(new ThreadStart(delegate()
                    {
-                       do
-                       {
+                       //do
+                       //{
                            res = RF_Set_Sample(App_Configure.Cnfgs.ComAddr1, RFPriority.LvlTwo, OffsetPower(Convert.ToSingle(f1 / 1000), Convert.ToSingle(pow1), 1), Convert.ToSingle(f1 / 1000), ref  status1);
+                           double rfVal = Convert.ToDouble(label11.Text);
+                           if (rfVal < (Convert.ToDouble(pow1)-1.5) || rfVal > (Convert.ToDouble(pow1)+1.5))
+                           {
+                               Log.WriteLog("rf1 again", Log.EFunctionType.API);
+                               //Thread.Sleep(50);
+                               res = RF_Set_Sample(App_Configure.Cnfgs.ComAddr1, RFPriority.LvlTwo, OffsetPower(Convert.ToSingle(f1 / 1000), Convert.ToSingle(pow1), 1), Convert.ToSingle(f1 / 1000), ref  status1);
+                           }
                            isFirstConnect++;
-                       }
-                       while (isFirstConnect == 1);
+                      
+                       //}
+                       //while (isFirstConnect == 1);
                    }));
                     string vvvv = label11.Text;
 
@@ -266,12 +276,19 @@ namespace jcPimSoftware
                     bool res = false;
                     this.Invoke(new ThreadStart(delegate()
                    {
-                       do
-                       {
+                       //do
+                       //{
                            res = RF_Set_Sample(App_Configure.Cnfgs.ComAddr2, RFPriority.LvlTwo, OffsetPower(Convert.ToSingle(f2 / 1000), Convert.ToSingle(pow2), 2), Convert.ToSingle(f2 / 1000), ref  status2);
+                           double rfVal = Convert.ToDouble(label12.Text);
+                           if (rfVal < (Convert.ToDouble(pow2) - 1.5) || rfVal > (Convert.ToDouble(pow2) + 1.5))
+                           {
+                               Log.WriteLog("rf2 again", Log.EFunctionType.API);
+                               //Thread.Sleep(50);
+                               res = RF_Set_Sample(App_Configure.Cnfgs.ComAddr2, RFPriority.LvlTwo, OffsetPower(Convert.ToSingle(f2 / 1000), Convert.ToSingle(pow2), 2), Convert.ToSingle(f2 / 1000), ref  status2);
+                           }
                            isFirstConnect++;
-                       }
-                       while (isFirstConnect == 1);
+                       //}
+                       //while (isFirstConnect == 1);
                    }));
                     string vvvv = label12.Text;
                     //while (true&&rf2_first)
@@ -300,6 +317,8 @@ namespace jcPimSoftware
                     if (n >= 0)
                         vals[n] = vvvv;
                 }
+
+               
 
                 if (pim_)
                 {
@@ -386,19 +405,19 @@ namespace jcPimSoftware
                     break;
                 case "JC:SIG1:FREQ?":
                     result = numericUpDown4.Value.ToString() + enters;
-                    rf1_ = true;
+                   // rf1_ = true;
                     break;
                 case "JC:SIG2:FREQ?":
                     result = numericUpDown3.Value.ToString() + enters;
-                    rf2_ = true;
+                   // rf2_ = true;
                     break;
                 case "JC:SIG1:POW?":
                     result = numericUpDown1.Value.ToString()+enters;
-                    rf1_ = true;
+                   // rf1_ = true;
                     break;
                 case "JC:SIG2:POW?":
                     result =numericUpDown2.Value.ToString()+enters;
-                    rf2_ = true;
+                   // rf2_ = true;
                     break;
                 case "JC:SIG1:OUTP?":
                     if (radioButton2.Checked) result ="OFF"+enters;
@@ -427,6 +446,10 @@ namespace jcPimSoftware
                     result =  "bbb" ;
                     rf2_ = true;
                     break;
+                case "JC:SIG3:DET?":
+                    result = "ccc";
+                    rf3_ = true;
+                    break;
                 case "JC:PIM:FREQ?":
                     this.Invoke(new ThreadStart(delegate()
                     {
@@ -446,6 +469,7 @@ namespace jcPimSoftware
 
         bool rf1_ = false;
         bool rf2_ = false;
+        bool rf3_ = false;
         bool pim_ = false;
 
         void SetMesss(string value)
@@ -466,7 +490,7 @@ namespace jcPimSoftware
                            if (f1 / 1000 >= numericUpDown4.Minimum && f1 / 1000 <= numericUpDown4.Maximum)
                            {
                                numericUpDown4.Value = f1 / 1000;
-                               rf1_ = true;
+                              // rf1_ = true;
                            }
                         }));
                        break;
@@ -477,7 +501,7 @@ namespace jcPimSoftware
                           if (f2 / 1000 >= numericUpDown3.Minimum && f2 / 1000 <= numericUpDown3.Maximum)
                           {
                               numericUpDown3.Value = f2 / 1000;
-                              rf2_ = true;
+                            //  rf2_ = true;
                           }
                        })); 
                        break;
@@ -488,7 +512,7 @@ namespace jcPimSoftware
                            if (pow1 >= numericUpDown1.Minimum && pow1 <= numericUpDown1.Maximum)
                            {
                                numericUpDown1.Value = pow1;
-                               rf1_ = true;
+                            //   rf1_ = true;
                            }
                        }));
                        break;
@@ -499,7 +523,7 @@ namespace jcPimSoftware
                             if (pow2 >= numericUpDown2.Minimum && pow2 <= numericUpDown2.Maximum)
                             {
                                 numericUpDown2.Value = pow2;
-                                rf2_ = true;
+                              //  rf2_ = true;
                             }
                        })); 
                        break;
@@ -884,6 +908,7 @@ namespace jcPimSoftware
             if (RFon)
             {
                 RFSignal.RFOn(Addr, Lvl);//打开功放
+               
             }
             else
             {
@@ -1003,10 +1028,14 @@ namespace jcPimSoftware
             //{
             //    //nozuo
             //}
+
+
             else if (RF_Type == 0)
                 Thread.Sleep(50);
             else
                 Thread.Sleep(150);
+
+
             //status.Status2.OutP = ps1.Status2.OutP + Tx_Tables.pim_rev_tx1disp.Offset(ps1.Status2.Freq, settings.Tx, Tx_Tables.pim_rev_offset1_disp);
             //ps2.Status2.OutP = ps2.Status2.OutP + Tx_Tables.pim_rev_tx2disp.Offset(ps2.Status2.Freq, settings.Tx2, Tx_Tables.pim_rev_offset2_disp);
 
@@ -1871,6 +1900,8 @@ namespace jcPimSoftware
 
             o = ScanModel;
 
+            //Thread.Sleep(50);
+            //Log.WriteLog("pim 200", Log.EFunctionType.API);
             //thdAnalysis = new Thread(ISpectrumObj.StartAnalysis);
             //thdAnalysis.IsBackground = true;
             //thdAnalysis.Start(o);
