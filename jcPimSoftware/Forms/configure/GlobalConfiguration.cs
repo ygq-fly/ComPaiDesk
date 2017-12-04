@@ -232,26 +232,30 @@ namespace jcPimSoftware
                 return;
             }
 
-            if (radio_gpio_old.Checked)
-            {
-                App_Configure.Cnfgs.Gpio = 0;
-            }
-            if (radio_gpio_new.Checked)
-            {
-                App_Configure.Cnfgs.Gpio = 1;
-            }
 
-            if (radioNarrow.Checked)
+            if (false)
             {
-                //设置窄带
-                GPIO.Rev();
+                if (radio_gpio_old.Checked)
+                {
+                    App_Configure.Cnfgs.Gpio = 0;
+                }
+                if (radio_gpio_new.Checked)
+                {
+                    App_Configure.Cnfgs.Gpio = 1;
+                }
 
-            }
-            if (radioBroad.Checked)
-            {
-                //设置宽带
-                GPIO.Fwd();
+                if (radioNarrow.Checked)
+                {
+                    //设置窄带
+                    GPIO.Rev();
 
+                }
+                if (radioBroad.Checked)
+                {
+                    //设置宽带
+                    GPIO.Fwd();
+
+                }
             }
 
             if (chk_battary.Checked)

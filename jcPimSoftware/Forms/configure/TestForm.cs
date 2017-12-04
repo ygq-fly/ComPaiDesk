@@ -1004,6 +1004,7 @@ namespace jcPimSoftware
             ScanModel.EndFreq = centerFreq + App_Settings.pim.Scanband;
             ScanModel.Unit = CommonDef.EFreqUnit.MHz;
             ScanModel.Att = 0;
+             if (App_Configure.Cnfgs.Spectrum == SpectrumType.FanShuang)
             ScanModel.Rbw = rbw;
             ScanModel.Vbw = vbw;
             ScanModel.EnableTimer = true;

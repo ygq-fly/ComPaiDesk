@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Timers;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace jcPimSoftware
 {
@@ -219,7 +220,7 @@ namespace jcPimSoftware
 
             //获取频谱分析数据
             values = (PointF[])ISpectrumObj.GetSpectrumData();
-
+            values = (PointF[])ISpectrumObj.GetSpectrumData();
             //在取得的频谱分析数据中，搜索Y值最大点，将其Y值作为收信值
             for (int J = 0; J < values.Length; J++)
             {
@@ -496,6 +497,8 @@ namespace jcPimSoftware
                 //Log.WriteLog("start     tx1=" + rfStatus_1.Status2.Freq + " tx2=" + rfStatus_2.Status2.Freq.ToString() + "\r\n", Log.EFunctionType.PIM);
                 if (n == 0)//扫描上行
                 {
+                    //Stopwatch st5 = new Stopwatch();
+                    //st5.Start();
                     if (i == 0)
                     {
 
@@ -588,6 +591,8 @@ namespace jcPimSoftware
                     //Log.WriteLog("tx1=" + item[i].Tx1.ToString() + " tx2=" + item[i].Tx2.ToString() + "  rx=" + exe_params.SpeParam.StartFreq.ToString() + " rxe=" + exe_params.SpeParam.EndFreq.ToString() + "\r\n", Log.EFunctionType.PIM);
                     //Log.WriteLog("======tx1=" + rfStatus_1.Status2.Freq + " tx2=" + rfStatus_2.Status2.Freq.ToString() + "\r\n", Log.EFunctionType.PIM);
                     //MessageBox.Show("tx1=" + item[i].Tx1.ToString() + " tx2=" + item[i].Tx2.ToString() + "  rx=" + exe_params.SpeParam.StartFreq.ToString() + " rxe=" + exe_params.SpeParam.EndFreq.ToString());
+                    //st5.Stop();
+                    //Log.WriteLog("local rf1 " + st5.ElapsedMilliseconds.ToString(), Log.EFunctionType.API);
                 }
                 else //扫描下行
                 {
@@ -704,9 +709,13 @@ namespace jcPimSoftware
 
                     bErrors1 |= del_RF1_Sampel.EndInvoke(ref rfStatus_1, Ir_RF1_Sampel);
                     bErrors2 |= del_RF2_Sampel.EndInvoke(ref rfStatus_2, Ir_RF2_Sampel);
-                }                
-
+                }
+                //Stopwatch st2 = new Stopwatch();
+                //st2.Start();
                 del_spe.EndInvoke(Ir_Spec);
+                //st2.Stop();
+                //Log.WriteLog("local set pim  time:" + st2.ElapsedMilliseconds.ToString(), Log.EFunctionType.API);
+               
 
                 bErrors1 = CheckRF_1(bErrors1);
                 bErrors2 = CheckRF_2(bErrors2);

@@ -37,28 +37,28 @@ namespace jcPimSoftware
             App_Configure.Cnfgs.LoadSettings();
 
             //判断授权文件
-            //Code c = new Code();
-            //try
-            //{
-            //    if (File.Exists(Code.strFilePath))
-            //    {
-            //        if (!c.CheckFile(App_Configure.Cnfgs.SN.ToLower()))
-            //        {
-            //            running = false;
-            //            MessageBox.Show("授权日期已到！");
-            //        }
-            //    }
-            //    else
-            //    {
-            //        running = false;
-            //        MessageBox.Show("请先生成授权文件！");
-            //    }
-            //}
-            //catch
-            //{
-            //    running = false;
-            //    MessageBox.Show("授权文件缺失或错误，请重新生成授权文件！");
-            //}
+            Code c = new Code();
+            try
+            {
+                if (File.Exists(Code.strFilePath))
+                {
+                    if (!c.CheckFile(App_Configure.Cnfgs.SN.ToLower()))
+                    {
+                        running = false;
+                        MessageBox.Show("授权日期已到！");
+                    }
+                }
+                else
+                {
+                    running = false;
+                    MessageBox.Show("请先生成授权文件！");
+                }
+            }
+            catch
+            {
+                running = false;
+                MessageBox.Show("授权文件缺失或错误，请重新生成授权文件！");
+            }
 
             if (running)
             {
@@ -389,6 +389,21 @@ namespace jcPimSoftware
                     sf.GetInfoMation("FanShaung connect failed!");
                     Log.WriteLog("FanShaung connect failed!", Log.EFunctionType.SPECTRUM);
                 }
+                //else
+                //{
+                //    object o;
+                    
+                //    model.Rbw = 30;
+                   
+                //    o = model;
+                //    if (!ISpectrumObj.Setting(o))
+                //    {
+                //        Thread.Sleep(1000);
+                //        ISpectrumObj.ResetStatus();
+                //        sf.GetInfoMation("FanShaung connect failed!");
+                //        Log.WriteLog("FanShaung connect failed!", Log.EFunctionType.SPECTRUM);
+                //    }
+                //}
             }
 
             #endregion   

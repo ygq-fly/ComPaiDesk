@@ -14,10 +14,17 @@ namespace jcPimSoftware
 {
     public partial class MS_SETTING : Form
     {
+
+        delegate void del_SPECTRUM(SpectrumLib.Models.ScanModel sp);
+        delegate bool del_RF_Do_Sample(int Addr,
+                             int Lvl,
+                             float P,
+                             float F,
+                             ref PowerStatus status);
         #region 变量定义
         //bool isgetpim = false;
-        decimal pow1 ;
-        decimal pow2;
+        decimal pow1=43 ;
+        decimal pow2=43;
         decimal f1;
         decimal f2;
         bool isrf1_rest = false;
@@ -29,6 +36,7 @@ namespace jcPimSoftware
         decimal pimval;
         bool openRf1_ = false;
         bool openRf2_ = false;
+        bool firstpim = true;
         /// <summary>
         /// 执行扫描参数，在扫描函数中，应该使用此参数
         /// 它从usr_sweeps复制过来
@@ -146,7 +154,8 @@ namespace jcPimSoftware
 
         bool rf1_first = true;
         bool rf2_first = true;
-
+        IAsyncResult Ir_Spec,
+            Ir_RF1_Sampel, Ir_RF2_Sampel = null;
         private void sa_ReachedEventHandler2_MS(object sender, ReachedEventArgs e)
         {
             try
@@ -164,7 +173,8 @@ namespace jcPimSoftware
                 //     {
                 //         button2.Enabled = false;
                 //     }));
-
+                Stopwatch st = new Stopwatch();
+                st.Start();
                 values = e.msg.key.Split(';');
                 List<string> vals = new List<string>();
                
@@ -177,184 +187,155 @@ namespace jcPimSoftware
                 }
                          
                 analyzeSpecialProcess(ref f1, ref f2, ref pimval);
-                //if (rf1_)
-                //{
-                    //bool res = false;
-                    //bool res2 = false;
-                   // this.Invoke(new ThreadStart(delegate()
-                   //{
-                   //    //res = RF_Set_Sample(App_Configure.Cnfgs.ComAddr1, (int)RFPriority.LvlTwo, OffsetPower(Convert.ToSingle(f1), Convert.ToSingle(pow1), 1), Convert.ToSingle(f1), ref  status1);
-                   //    do
-                   //    {
-                   //        res = RF_Set_Sample2(App_Configure.Cnfgs.ComAddr1, (int)RFPriority.LvlTwo, OffsetPower(Convert.ToSingle(f1 / 1000), Convert.ToSingle(pow1), 1), Convert.ToSingle(f1 / 1000), ref  status1);
-                   //        res2 = RF_Set_Sample2(App_Configure.Cnfgs.ComAddr2, (int)RFInvolved.Rf_2, OffsetPower(Convert.ToSingle(f2 / 1000), Convert.ToSingle(pow2), 2), Convert.ToSingle(f2 / 1000), ref  status2);
-                   //        RF_Set_Sample2_Wait(App_Configure.Cnfgs.ComAddr1, (int)RFPriority.LvlTwo, OffsetPower(Convert.ToSingle(f1 / 1000), Convert.ToSingle(pow1), 1), Convert.ToSingle(f1 / 1000), ref  status1);
-                   //        RF_Set_Sample2_Wait(App_Configure.Cnfgs.ComAddr2, (int)RFInvolved.Rf_2, OffsetPower(Convert.ToSingle(f2 / 1000), Convert.ToSingle(pow2), 2), Convert.ToSingle(f2 / 1000), ref  status2);
-                   //        isFirstConnect++;
-                   //    }
-                   //    while (isFirstConnect == 1);
-                      
-                   //}));
-                   // string vvvv = label11.Text;
-                   // if (res)
-                   // {
-                   //     vvvv = "-10000";
-                   //     err_string += "rf1 timeout;";
-                   // }
-
-                   // int n = vals.IndexOf("aaa", 0, vals.Count);
-                   // if (n >= 0)
-                   //     vals[n] = vvvv;
-
-                   // string vvvv2 = label12.Text;
-                   // if (res2)
-                   // {
-                   //     vvvv2 = "-10000";
-                   //     err_string += "rf2 timeout;";
-                   // }
-                   // int n2= vals.IndexOf("bbb", 0, vals.Count);
-                   // if (n2 >= 0)
-                   //     vals[n2] = vvvv2;
-                //}
 
 
                 if (rf1_)
                 {
-                    bool res = false;
-                    this.Invoke(new ThreadStart(delegate()
-                   {
-                       //do
-                       //{
-                           res = RF_Set_Sample(App_Configure.Cnfgs.ComAddr1, RFPriority.LvlTwo, OffsetPower(Convert.ToSingle(f1 / 1000), Convert.ToSingle(pow1), 1), Convert.ToSingle(f1 / 1000), ref  status1);
-                           double rfVal = Convert.ToDouble(label11.Text);
-                           if (rfVal < (Convert.ToDouble(pow1)-1.5) || rfVal > (Convert.ToDouble(pow1)+1.5))
-                           {
-                               Log.WriteLog("rf1 again", Log.EFunctionType.API);
-                               //Thread.Sleep(50);
-                               res = RF_Set_Sample(App_Configure.Cnfgs.ComAddr1, RFPriority.LvlTwo, OffsetPower(Convert.ToSingle(f1 / 1000), Convert.ToSingle(pow1), 1), Convert.ToSingle(f1 / 1000), ref  status1);
-                           }
-                           isFirstConnect++;
-                      
-                       //}
-                       //while (isFirstConnect == 1);
-                   }));
-                    string vvvv = label11.Text;
 
-                    //while (true&&rf1_first)
-                    //{
-                    //    if (Math.Abs(Convert.ToSingle(vvvv)) >= 43.5 || Math.Abs(Convert.ToSingle(vvvv)) <= 42.5)
-                    //    {
-                    //        NativeMessage.PostMessage(this.Handle, MessageID.MS_RFSET1, 0, 0);
-
-                    //        NativeMessage.PostMessage(this.Handle, MessageID.MS_RFSET1, 0, 1);
-                    //        res = RF_Set_Sample(App_Configure.Cnfgs.ComAddr1, (int)RFPriority.LvlTwo, OffsetPower(Convert.ToSingle(f1 / 1000), Convert.ToSingle(pow1), 1), Convert.ToSingle(f1 / 1000), ref  status1);
-                    //        vvvv = label11.Text;
-                    //    }
-                    //    else
-                    //    {
-                    //        rf1_first = false;
-                    //        break;
-                    //    }
-                    //    Thread.Sleep(100);
-                    //}
-                        if (res)
-                        {
-                            vvvv = "-10000";
-                            err_string += "rf1 timeout;";
-                        }
-
-                        int n = vals.IndexOf("aaa", 0, vals.Count);
-                        if (n >= 0)
-                            vals[n] = vvvv;
-                    
-                    
+                    //Stopwatch st4 = new Stopwatch();
+                    //st4.Start();
+                    Ir_RF1_Sampel = del_RF1_Set_Sample.BeginInvoke(App_Configure.Cnfgs.ComAddr1, (int)RFPriority.LvlTwo, OffsetPower(Convert.ToSingle(f1 / 1000), Convert.ToSingle(pow1), 1), Convert.ToSingle(f1 / 1000), ref  status1, null, null);
+                   
+                    //st4.Stop();
+                    //Log.WriteLog("rf1  time:" + st4.ElapsedMilliseconds.ToString(), Log.EFunctionType.API);
+                   
                 }
-            
+
                 if (rf2_)
                 {
-                    if (rf1_) isFirstConnect--;
-                    bool res = false;
-                    this.Invoke(new ThreadStart(delegate()
-                   {
-                       //do
-                       //{
-                           res = RF_Set_Sample(App_Configure.Cnfgs.ComAddr2, RFPriority.LvlTwo, OffsetPower(Convert.ToSingle(f2 / 1000), Convert.ToSingle(pow2), 2), Convert.ToSingle(f2 / 1000), ref  status2);
-                           double rfVal = Convert.ToDouble(label12.Text);
-                           if (rfVal < (Convert.ToDouble(pow2) - 1.5) || rfVal > (Convert.ToDouble(pow2) + 1.5))
-                           {
-                               Log.WriteLog("rf2 again", Log.EFunctionType.API);
-                               //Thread.Sleep(50);
-                               res = RF_Set_Sample(App_Configure.Cnfgs.ComAddr2, RFPriority.LvlTwo, OffsetPower(Convert.ToSingle(f2 / 1000), Convert.ToSingle(pow2), 2), Convert.ToSingle(f2 / 1000), ref  status2);
-                           }
-                           isFirstConnect++;
-                       //}
-                       //while (isFirstConnect == 1);
-                   }));
-                    string vvvv = label12.Text;
-                    //while (true&&rf2_first)
-                    //{
-                    //    if (Math.Abs(Convert.ToSingle(vvvv)) >= 43.5 || Math.Abs(Convert.ToSingle(vvvv)) <= 42.5)
-                    //    {
-                    //        NativeMessage.PostMessage(this.Handle, MessageID.MS_RFSET2, 0, 0);
 
-                    //        NativeMessage.PostMessage(this.Handle, MessageID.MS_RFSET2, 0, 1);
-                    //        res = RF_Set_Sample(App_Configure.Cnfgs.ComAddr2, (int)RFInvolved.Rf_2, OffsetPower(Convert.ToSingle(f2 / 1000), Convert.ToSingle(pow2), 2), Convert.ToSingle(f2 / 1000), ref  status2);
-                    //        vvvv = label12.Text;
-                    //    }
-                    //    else
-                    //    {
-                    //        rf2_first = false;
-                    //        break;
-                    //    }
-                    //    Thread.Sleep(100);
-                    //}
-                    if (res)
-                    {
-                        vvvv = "-10000";
-                        err_string += "rf2 timeout;";
-                    }
-                    int n = vals.IndexOf("bbb", 0, vals.Count);
-                    if (n >= 0)
-                        vals[n] = vvvv;
+                    //Stopwatch st3 = new Stopwatch();
+                    //st3.Start();
+                    Ir_RF2_Sampel = del_RF2_Set_Sample.BeginInvoke(App_Configure.Cnfgs.ComAddr2, (int)RFPriority.LvlTwo, OffsetPower(Convert.ToSingle(f2 / 1000), Convert.ToSingle(pow2), 2), Convert.ToSingle(f2 / 1000), ref  status2, null, null);
+                   
+                    //st3.Stop();
+                   // Log.WriteLog("rf2  time:" + st3.ElapsedMilliseconds.ToString(), Log.EFunctionType.API);
+                    
+                    
+                    
+                    //string vvvv = label12.Text;
+
+                    //int n = vals.IndexOf("bbb", 0, vals.Count);
+                    //if (n >= 0)
+                    //    vals[n] = vvvv;
                 }
+                if (pim_)
+                {
+
+                    //Stopwatch st2 = new Stopwatch();
+                    //st2.Start();
+
+                    Ir_Spec = del_spe.BeginInvoke(StartPim(), null, null);
+                    //if (firstpim)
+                    //{
+                    //    Thread.Sleep(50);
+                    //del_spe.EndInvoke(Ir_Spec);
+                    //Ir_Spec = del_spe.BeginInvoke(StartPim(), null, null);
+                    //    firstpim = false;
+                    //}
+                  
+                    //st2.Stop();
+                    //Log.WriteLog("set pim  time:" + st2.ElapsedMilliseconds.ToString(), Log.EFunctionType.API);
+                    //int i = 0;
+                    //int n = vals.IndexOf("abc", 0, vals.Count);
+                    //if (n >= 0)
+                    //    vals[n] = label9.Text;
+                }
+
+                #region 11
+
+                
+                //if (rf1_)
+                //{
+                   
+                
+                //    Stopwatch st4 = new Stopwatch();
+                //    st4.Start();
+                //    del_RF1_Set_Sample.EndInvoke(ref rfStatus_1, Ir_RF1_Sampel);
+                //    st4.Stop();
+                //    Log.WriteLog("rf1  time:" + st4.ElapsedMilliseconds.ToString(), Log.EFunctionType.API);
+                //    string vvvv = label11.Text;
+
+
+                //    int n = vals.IndexOf("aaa", 0, vals.Count);
+                //    if (n >= 0)
+                //        vals[n] = vvvv;
+                    
+                    
+                //}
+            
+                //if (rf2_)
+                //{
+                   
+               
+                //    Stopwatch st3 = new Stopwatch();
+                //    st3.Start();
+                //    del_RF2_Set_Sample.EndInvoke(ref rfStatus_2, Ir_RF2_Sampel);
+                //    st3.Stop();
+                //    Log.WriteLog("rf2  time:" + st3.ElapsedMilliseconds.ToString(), Log.EFunctionType.API);
+                //    string vvvv = label12.Text;
+
+                //    int n = vals.IndexOf("bbb", 0, vals.Count);
+                //    if (n >= 0)
+                //        vals[n] = vvvv;
+                //}
 
                
 
-                if (pim_)
+                //if (pim_)
+                //{
+
+
+                //    Stopwatch st2 = new Stopwatch();
+                //    st2.Start();
+                 
+                //       if (Ir_Spec != null)
+                //            del_spe.EndInvoke(Ir_Spec);
+                //    //}
+                //    st2.Stop();
+                //    Log.WriteLog("set pim  time:" + st2.ElapsedMilliseconds.ToString(), Log.EFunctionType.API);
+                    
+                    
+
+                  
+
+                //    int i = 0;
+                //    int n = vals.IndexOf("abc", 0, vals.Count);
+
+                  
+                //    if (n >= 0)
+                //        vals[n] = label9.Text;
+                  
+                //}
+
+                #endregion
+
+                if (pim_||rf1_||rf2_)
                 {
-                    Stopwatch st = new Stopwatch();
-                    st.Start();
-                    StartScan();
-                    int i = 0;
-                    int n = vals.IndexOf("abc", 0, vals.Count);
-                    while (true)
+                    if (Ir_RF1_Sampel != null)
+                        del_RF1_Set_Sample.EndInvoke(ref rfStatus_1, Ir_RF1_Sampel);
+                    if (Ir_RF2_Sampel != null)
+                        del_RF2_Set_Sample.EndInvoke(ref rfStatus_2, Ir_RF2_Sampel);
+                    if (Ir_Spec != null)
                     {
-
-                        Monitor.Enter(ctrl);
-                        bool isgetpim = ctrl.Quit;
-                        Monitor.Exit(ctrl);
-                        if (isgetpim)
-                        {
-
-                            if (n >= 0)
-                                vals[n] = label9.Text;
-                            //sa_ms.OnSend(label9.Text +"\r\n", _addr);
-                            break;
-                        }
-                        Thread.Sleep(20);
-                        i++;
-                        if (i > 100)
-                        {
-                            vals[n] = "-10000";
-                            err_string += "pim timeout;";
-                            break;
-                        }
+                       // Thread.Sleep(30);
+                        del_spe.EndInvoke(Ir_Spec);
                     }
-                    st.Stop();
-                    this.Invoke(new ThreadStart(delegate()
-                 {
-                     label14.Text = "分析时间：" + st.ElapsedMilliseconds.ToString();
-                 }));
+
+                    string vvvv = label11.Text;
+                    int n = vals.IndexOf("aaa", 0, vals.Count);
+                    if (n >= 0)
+                        vals[n] = vvvv;
+
+                    vvvv = label12.Text;
+
+                    n = vals.IndexOf("bbb", 0, vals.Count);
+                    if (n >= 0)
+                        vals[n] = vvvv;
+
+                    n = vals.IndexOf("abc", 0, vals.Count);
+                    if (n >= 0)
+                        vals[n] = label9.Text;
                 }
 
                 string allMess = "";
@@ -369,12 +350,20 @@ namespace jcPimSoftware
                 }
                 if (allMess != "") 
                 sa_ms.OnSend(allMess, _addr);
+                st.Stop();
+                //Log.WriteLog(e.msg.key + " " + e.msg.json + "  time:" + st.ElapsedMilliseconds.ToString(), Log.EFunctionType.API);
                 vals.Clear();
                 pim_ = false;
                 rf1_ = false;
                 rf2_ = false;
                 rf2_first = true;
                 rf1_first = true;
+                Ir_RF1_Sampel = null;
+                Ir_RF2_Sampel = null;
+                Ir_Spec = null;
+                f1 = Convert.ToDecimal(numericUpDown4.Value) * 1000;
+                f2 = Convert.ToDecimal(numericUpDown3.Value) * 1000;
+                pimval = Convert.ToDecimal(textBox5.Text.Trim())*1000;
                 //stss.Stop();
                 //this.Invoke(new ThreadStart(delegate()
                 // {
@@ -388,7 +377,7 @@ namespace jcPimSoftware
                 sa_ms.OnStop();
                 StopScan();
                 this.Hide();
-                //MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.Message);
             }
 
         }
@@ -402,6 +391,15 @@ namespace jcPimSoftware
                 case "JC:PIM:DATA?":
                     pim_ = true;
                     result = "abc";
+                    
+                    //Ir_Spec = del_spe.BeginInvoke(StartPim(), null, null);
+                    //if (firstpim)
+                    //{
+                    //    Thread.Sleep(50);
+                    //    del_spe.EndInvoke(Ir_Spec);
+                    //    Ir_Spec = del_spe.BeginInvoke(StartPim(), null, null);
+                    //    firstpim = false;
+                    //}
                     break;
                 case "JC:SIG1:FREQ?":
                     result = numericUpDown4.Value.ToString() + enters;
@@ -441,10 +439,14 @@ namespace jcPimSoftware
                 case "JC:SIG1:DET?":
                     result =  "aaa" ;
                     rf1_ = true;
+                    //Ir_RF1_Sampel = del_RF1_Set_Sample.BeginInvoke(App_Configure.Cnfgs.ComAddr1, (int)RFPriority.LvlTwo, OffsetPower(Convert.ToSingle(f1/1000), Convert.ToSingle(pow1), 1), Convert.ToSingle(f1/1000), ref  status1,null,null);
+                 
                     break;
                 case "JC:SIG2:DET?":
                     result =  "bbb" ;
                     rf2_ = true;
+                    //Ir_RF2_Sampel = del_RF2_Set_Sample.BeginInvoke(App_Configure.Cnfgs.ComAddr2, (int)RFPriority.LvlTwo, OffsetPower(Convert.ToSingle(f2 / 1000), Convert.ToSingle(pow2), 2), Convert.ToSingle(f2 / 1000), ref  status2, null, null);
+               
                     break;
                 case "JC:SIG3:DET?":
                     result = "ccc";
@@ -487,6 +489,7 @@ namespace jcPimSoftware
                         this.Invoke(new ThreadStart(delegate()
                         {                           
                            f1 = Convert.ToDecimal(Convert.ToSingle(data[1]) );
+                           //Log.WriteLog("f1 set " + f1.ToString(), Log.EFunctionType.API);
                            if (f1 / 1000 >= numericUpDown4.Minimum && f1 / 1000 <= numericUpDown4.Maximum)
                            {
                                numericUpDown4.Value = f1 / 1000;
@@ -498,6 +501,7 @@ namespace jcPimSoftware
                        this.Invoke(new ThreadStart(delegate()
                        {                           
                           f2 = Convert.ToDecimal(Convert.ToSingle(data[1]));
+                          //Log.WriteLog("f2 set " + f2.ToString(), Log.EFunctionType.API);
                           if (f2 / 1000 >= numericUpDown3.Minimum && f2 / 1000 <= numericUpDown3.Maximum)
                           {
                               numericUpDown3.Value = f2 / 1000;
@@ -615,7 +619,10 @@ namespace jcPimSoftware
                 MessageBox.Show(this,ex.Message);
             }
         }
-
+        del_SPECTRUM del_spe=null;
+        del_RF_Do_Sample del_RF1_Set_Sample;
+        del_RF_Do_Sample del_RF2_Set_Sample;
+        
         public void ShowS()
         {
             type = App_Configure.Cnfgs.Spectrum;
@@ -634,6 +641,12 @@ namespace jcPimSoftware
                     ISpectrumObj = new SpectrumLib.Spectrums.FanShuang(this.Handle, MessageID.SPECTRUEME_SUCCED, MessageID.SPECTRUM_ERROR);
                     break;
             }
+            RFSignal.SetWndHandle(this.Handle);
+            if(del_spe==null)
+            del_spe = new del_SPECTRUM(ISpectrumObj.StartAnalysis);
+            del_RF1_Set_Sample = new del_RF_Do_Sample(RF_Set_Sample);
+            del_RF2_Set_Sample = new del_RF_Do_Sample(RF_Set_Sample);
+            firstpim = true;
         }
         private void MS_SETTING_Load(object sender, EventArgs e)
         {
@@ -693,15 +706,15 @@ namespace jcPimSoftware
             power1_Handle = new ManualResetEvent(false);
             power2_Handle = new ManualResetEvent(false);
             //建立射频功放层
-            //RFSignal.SetWndHandle(exe_params.WndHandle);
+            RFSignal.SetWndHandle(this.Handle);
 
           
 
             //范围
-            numericUpDown4.Minimum = (decimal)App_Settings.sgn_1.Min_Freq;
-            numericUpDown4.Maximum = (decimal)App_Settings.sgn_1.Max_Freq;
-            numericUpDown3.Minimum = (decimal)App_Settings.sgn_2.Min_Freq;
-            numericUpDown3.Maximum = (decimal)App_Settings.sgn_2.Max_Freq;
+            //numericUpDown4.Minimum = (decimal)App_Settings.sgn_1.Min_Freq;
+            //numericUpDown4.Maximum = (decimal)App_Settings.sgn_1.Max_Freq;
+            //numericUpDown3.Minimum = (decimal)App_Settings.sgn_2.Min_Freq;
+            //numericUpDown3.Maximum = (decimal)App_Settings.sgn_2.Max_Freq;
             numericUpDown1.Minimum = (decimal)App_Settings.sgn_1.Min_Power;
             numericUpDown1.Maximum = (decimal)App_Settings.sgn_1.Max_Power;
             numericUpDown2.Minimum = (decimal)App_Settings.sgn_2.Min_Power;
@@ -721,8 +734,11 @@ namespace jcPimSoftware
             textBox1.Text += "机型：" + App_Configure.Cnfgs.Mac_Desc+"\r\n";
             textBox1.Text += "TX频段范围：" + App_Settings.sgn_1.Min_Freq.ToString() + "-" + App_Settings.sgn_2.Max_Freq.ToString()+"MHz\r\n";
             textBox1.Text += "RX频段范围：" + App_Settings.spfc.cbn.RxS.ToString() + "-" + App_Settings.spfc.cbn.RxE.ToString()+"MHz";
-
-
+            if (del_spe == null)
+            del_spe = new del_SPECTRUM(ISpectrumObj.StartAnalysis);
+            del_RF1_Set_Sample = new del_RF_Do_Sample(RF_Set_Sample);
+            del_RF2_Set_Sample = new del_RF_Do_Sample(RF_Set_Sample);
+            firstpim = true;
 
         }
         private void Bind(ComboBox cmbx)
@@ -943,7 +959,7 @@ namespace jcPimSoftware
             if (RFon)
             {
                 RFSignal.RFOn(Addr, Lvl);//打开功放
-                Log.WriteLog("succ =" + Addr.ToString(), Log.EFunctionType.PIM);
+                //Log.WriteLog("succ =" + Addr.ToString(), Log.EFunctionType.PIM);
             }
             else
             {
@@ -1107,6 +1123,110 @@ namespace jcPimSoftware
 
          
             return (!RF_Succ);
+        }
+
+
+        private bool RF_Set_Sample3(int Addr,
+                          int Lvl,
+                          float P, float F, ref PowerStatus status)
+        {
+            // return false;
+            bool RF_Succ = true;
+            RFSignal.RFClear(Addr, Lvl);
+
+            //紫光功放改变频率会影响功率，需先设置频率；韩国功放改变功率会影响频率，需先设置功率
+            if (RF_Type == 0)
+            {
+                //if (App_Configure.Cnfgs.RFFormula == 0)//对数LOG
+                //{
+                //    RFSignal.RFPowerFreq(Addr, Lvl, P, F);
+                //}
+                //else //线性Linear
+                //{
+                //    RFSignal.RFFreq(Addr, Lvl, F);
+                //    RFSignal.RFPower(Addr, Lvl, P);
+                //}
+                RFSignal.RFPowerFreqSample(Addr, Lvl, P, F);
+            }
+            else
+            {
+                RFSignal.RFPowerFreqSample(Addr, Lvl, P, F);
+            }
+
+            RFSignal.RFStart(Addr);
+
+            //等待功放
+            if (Addr == exe_params.DevInfo.RF_Addr1)
+            {
+                RF_Succ = power1_Handle.WaitOne(5000, true);
+                power1_Handle.Reset();
+            }
+            else
+            {
+                RF_Succ = power2_Handle.WaitOne(5000, true);
+                power2_Handle.Reset();
+            }
+
+            //没有发生功放通信超时，则获取功放状态信息
+            if (RF_Succ)
+                RFSignal.RFStatus(Addr, ref status);
+
+            if (status.Status1.Ver[1] >= 6)
+            {
+                //nozuo
+            }
+            else if (RF_Type == 0)
+                Thread.Sleep(50);
+            else
+                Thread.Sleep(150);
+
+            //返回通信超时的情况
+            return (!RF_Succ);
+        }
+
+
+        void GetPowshow(int Addr, PowerStatus status)
+        {
+            if (Addr == App_Configure.Cnfgs.ComAddr1)
+            {
+                string val = (status.Status2.OutP + Tx_Tables.pim_rev_tx1disp.Offset(status.Status2.Freq, (float)pow1, Tx_Tables.pim_rev_offset1_disp)).ToString("0.0");
+                int n = status.Status2.Locked;
+                //this.Invoke(new ThreadStart(delegate()
+                //{
+                float value_pim = Convert.ToSingle(val);
+                if (Math.Abs(value_pim - Convert.ToSingle(pow1)) > 0.2f && Math.Abs(value_pim - Convert.ToSingle(pow1)) <= 0.5f)
+                    value_pim = Convert.ToSingle(pow1) - 0.1f;
+                else if (Math.Abs(value_pim - Convert.ToSingle(pow1)) > 0.5f && Math.Abs(value_pim - Convert.ToSingle(pow1)) <= 2f)
+                    value_pim = Convert.ToSingle(pow1) + 0.1f;
+
+                label11.Text = value_pim.ToString("F2");
+                //if (n == 1)
+                //    label16.ForeColor = Color.Red;
+                //else
+                //    label16.ForeColor = Color.Green;
+                //}));
+            }
+            else
+            {
+                string val = (status.Status2.OutP + Tx_Tables.pim_rev_tx2disp.Offset(status.Status2.Freq, (float)pow2, Tx_Tables.pim_rev_offset2_disp)).ToString("0.0");
+
+                int n = status.Status2.Locked;
+                // this.Invoke(new ThreadStart(delegate()
+                //{
+
+                float value_pim = Convert.ToSingle(val);
+                if (Math.Abs(value_pim - Convert.ToSingle(pow2)) > 0.2f && Math.Abs(value_pim - Convert.ToSingle(pow2)) <= 0.5f)
+                    value_pim = Convert.ToSingle(pow1) - 0.1f;
+                else if (Math.Abs(value_pim - Convert.ToSingle(pow2)) > 0.5f && Math.Abs(value_pim - Convert.ToSingle(pow2)) <= 2f)
+                    value_pim = Convert.ToSingle(pow1) + 0.1f;
+
+                label12.Text = value_pim.ToString("F2");
+                //if (n == 1)
+                //    label17.ForeColor = Color.Red;
+                //else
+                //    label17.ForeColor = Color.Green;
+                //}));
+            }
         }
 
         private bool RF_Set_Sample2_Wait(int Addr,
@@ -1534,6 +1654,8 @@ namespace jcPimSoftware
        public static  bool analyzeSpecialProcess(ref decimal f1, ref decimal f2, ref decimal fpim)
         {
             //return false;
+
+            //Log.WriteLog("tx1 " + f1.ToString() + "tx2 " + f2.ToString() + "pim " + fpim.ToString(), Log.EFunctionType.API);
             const int RES_BANDWITDH = 70000;
             float f_f1 = Convert.ToSingle(f1);
             float f_f2 = Convert.ToSingle(f2);
@@ -1542,8 +1664,10 @@ namespace jcPimSoftware
             int offset = 100;
             if (App_Configure.Cnfgs.NoFilter == 1)
                 offset = 1000;
+
+            Log.WriteLog("f1 start " + f_f1.ToString()+ " f2 start "+f_f2.ToString()+" pim start " + fpim.ToString(), Log.EFunctionType.API);
             if ((Math.Abs(f1 - fpim) == RES_BANDWITDH || Math.Abs(f2 - fpim) == RES_BANDWITDH) ||
-                ((Math.Abs(f_f1 - f_pim) <= 140.7f && Math.Abs(f_f1 - f_pim) >= 139.3f) || (Math.Abs(f_f2 - f_pim) <= 140.7f && Math.Abs(f_f2 - f_pim) >= 139.3f)))
+                ((Math.Abs(f_f1 - f_pim) <= 140700f && Math.Abs(f_f1 - f_pim) >= 139300f) || (Math.Abs(f_f2 - f_pim) <= 140700f && Math.Abs(f_f2 - f_pim) >= 139300f)))
             {
                 //n=m+1;
                 //fpim=n*f1-m*f2
@@ -1578,6 +1702,9 @@ namespace jcPimSoftware
                         fpim = f2 - m * (f1 - f2);
                     }
                 }
+
+                Log.WriteLog("pim end " + fpim.ToString(), Log.EFunctionType.API);
+            
             }
             else
                 return false;
@@ -1900,7 +2027,7 @@ namespace jcPimSoftware
 
             o = ScanModel;
 
-            //Thread.Sleep(50);
+            Thread.Sleep(50);
             //Log.WriteLog("pim 200", Log.EFunctionType.API);
             //thdAnalysis = new Thread(ISpectrumObj.StartAnalysis);
             //thdAnalysis.IsBackground = true;
@@ -1910,9 +2037,47 @@ namespace jcPimSoftware
             th.Start(o);
         }
 
-        void StartPim()
-        { 
-        
+        ScanModel StartPim()
+        {
+
+          
+            float centerFreq = Convert.ToSingle(pimval / 1000);
+            Log.WriteLog("centerFreq " + centerFreq.ToString(), Log.EFunctionType.API);
+            object o;
+
+            SpectrumLib.Models.ScanModel ScanModel;
+            ScanModel = new ScanModel();
+            ScanModel.StartFreq = centerFreq - App_Settings.pim.Scanband;
+            ScanModel.EndFreq = centerFreq + App_Settings.pim.Scanband;
+            ScanModel.Unit = CommonDef.EFreqUnit.MHz;
+            ScanModel.Att = 0;
+            //ScanModel.Rbw = -1000;
+            ScanModel.EnableTimer = true;
+            ScanModel.Continued = false;
+            //ScanModel.TimeSpan = App_Settings.spc.SampleSpan;
+            //Log.WriteLog("center"+centerFreq.ToString(),Log.EFunctionType.PIM);
+            //if (type == 1)
+            //{
+            //    ScanModel.FullPoints = true;
+            //}
+            //else
+            //{
+            //    ScanModel.FullPoints = false;
+            //}
+
+            //ScanModel.Deli_averagecount = 6;
+            //ScanModel.Deli_detector = "AVERage";
+            //ScanModel.Deli_ref = -50;//REF
+            //ScanModel.Deli_refoffset = 0;
+            //ScanModel.Deli_startspe = 1;
+            //ScanModel.DeliSpe = CommonDef.SpectrumType.Deli_SPECTRUM;
+            //ScanModel.Deli_isSpectrum = true;
+
+            o = ScanModel;
+
+           
+
+            return ScanModel;
         }
 
         #endregion
@@ -1937,6 +2102,10 @@ namespace jcPimSoftware
 
         #endregion
 
+
+      
+
+
         #region 获取频谱数据
         /// <summary>
         /// 获取频谱数据
@@ -1944,9 +2113,12 @@ namespace jcPimSoftware
         /// <returns></returns>
         private float GetSpeRev()
         {
+            //Stopwatch st = new Stopwatch();
+            //st.Start();
             int maxIndex = 0;
             float max = float.MinValue;
             PointF[] PaintPointFs = (PointF[])ISpectrumObj.GetSpectrumData();
+            PaintPointFs = (PointF[])ISpectrumObj.GetSpectrumData();
             for (int i = 0; i < PaintPointFs.Length; i++)
             {
                 if (PaintPointFs[i].Y > max)
@@ -1957,6 +2129,9 @@ namespace jcPimSoftware
             }
             //MessageBox.Show("1");
             max = OffsetSpec(PaintPointFs[maxIndex].X, PaintPointFs[maxIndex].Y);
+
+            //st.Stop();
+            //Log.WriteLog("fenxi pim " + st.ElapsedMilliseconds.ToString(), Log.EFunctionType.API);
             return max;
         }
         private float GetSpeRev2()
@@ -2002,6 +2177,7 @@ namespace jcPimSoftware
             {
                 case MessageID.SPECTRUEME_SUCCED:
                     //label9.Text = (GetSpeRev()+App_Configure.Cnfgs.RxRef).ToString("0.0");
+                    //Thread.Sleep(50);
                     label9.Text = GetSpeRev().ToString("F1");
                     Monitor.Enter(ctrl);
                     ctrl.Quit = true;

@@ -224,7 +224,11 @@ namespace jcPimSoftware
 
                     case MessageID.PIM_SUCCED: //成功收到一个点
                         {
+                            //Stopwatch st = new Stopwatch();
+                            //st.Start();
                             PimSucced(m.WParam.ToInt32(), m.LParam.ToInt32());
+                            //st.Stop();
+                            //Log.WriteLog("local pim " + st.ElapsedMilliseconds.ToString(), Log.EFunctionType.API);
                             break;
                         }
                     case MessageID.MS_CONNECT:

@@ -286,7 +286,7 @@ namespace jcPimSoftware
             gc.ShowDialog();
             if (frmPim != null)
             {
-                frmPim.ChangePic();
+               // frmPim.ChangePic();
             }
             if (frmSpectrum != null)
             {
